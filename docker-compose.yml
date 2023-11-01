@@ -1,0 +1,61 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+      - ./ports.conf:/etc/apache2/ports.conf
+      - ./000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+    networks:
+      itnet:
+        ipv4_address: 192.168.100.2
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+    networks:
+      itnet:
+        ipv4_address: 192.168.100.3
+
+  nginx:
+    image: nginx:latest
+    restart: always  
+    ports:
+      - 80:80
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      itnet:
+        ipv4_address: 192.168.100.4
+    depends_on:
+      - wordpress
+
+volumes:
+  wordpress:
+  db:
+
+
+networks:
+  itnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.100.0/28
