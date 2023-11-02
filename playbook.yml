@@ -1,0 +1,5 @@
+---
+- hosts: "nod1"
+  become: true
+  roles:
+        - geerlingguy.docker
