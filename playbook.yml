@@ -3,3 +3,16 @@
   become: true
   roles:
         - geerlingguy.docker
+  tasks:
+    - name: cp config
+      ansible.builtin.copy:
+        src: files/.
+        dest: /home/vagrant/docker/
+        owner: root
+        group: root
+        mode: '0777'
+
+    - name: docker compose run
+      ansible.builtin.shell:
+        cmd: docker compose up -d
+        chdir: /home/vagrant/docker/
